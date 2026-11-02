@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#October 24, 2026
+#Nov 2, 2026
 #Install ECICR to Ubuntu 26.04.1
 #Author: Chih-Yuan Yang
 #Project: ECICR
@@ -323,8 +323,13 @@ fi
 #onnx
 cd ~/ECICR_build
 if [ "$machine" = "PC" ]; then
-  wget -O onnxruntime-linux-x64-gpu-1.22.0.tgz https://github.com/microsoft/onnxruntime/releases/download/v1.22.0/onnxruntime-linux-x64-gpu-1.22.0.tgz
-  tar -xvzf onnxruntime-linux-x64-gpu-1.22.0.tgz
+  if ((VRAMSize>=0)); then
+    wget -O onnxruntime-linux-x64-gpu-1.22.0.tgz https://github.com/microsoft/onnxruntime/releases/download/v1.22.0/onnxruntime-linux-x64-gpu-1.22.0.tgz
+    tar -xvzf onnxruntime-linux-x64-gpu-1.22.0.tgz
+  else
+    wget -O onnxruntime-linux-x64-1.22.0.tgz https://github.com/microsoft/onnxruntime/releases/download/v1.22.0/onnxruntime-linux-x64-1.22.0.tgz
+    tar -xvzf onnxruntime-linux-x64-1.22.0.tgz
+  if  
 elif [ "$machine" = "AGXOrin" ]; then
   wget -O onnxruntime-linux-aarch64-1.22.0.tgz https://github.com/microsoft/onnxruntime/releases/download/v1.22.0/onnxruntime-linux-aarch64-1.22.0.tgz
   tar -xvzf onnxruntime-linux-aarch64-1.22.0.tgz
@@ -365,12 +370,21 @@ mkdir build && cd build
 #Their CMakeLists.txt file needs /home/chihyuan/ECICR_build/onnxruntime-linux-x64-gpu-1.22.0/lib64, but there is no lib64 folder in onnxruntime-linux-x64-gpu-1.22.0. There is only a lib folder.
 #So, I create a symbolic link lib64 to lib
 if [ "$machine" = "PC" ]; then
-  cd ~/ECICR_build/onnxruntime-linux-x64-gpu-1.22.0
-  ln -s lib lib64
-  cd ~/ECICR_build/EmotiEffLib/emotieffcpplib/build
-  cmake .. -DWITH_ONNX=~/ECICR_build/onnxruntime-linux-x64-gpu-1.22.0 -DBUILD_SHARED_LIBS=ON
-  make -j$(nproc)
-  #The .so files are in ~/ECICR_build/EmotiEffLib/emotieffcpplib/build/lib
+  if ((VRAMSize==0)); then
+    cd ~/ECICR_build/onnxruntime-linux-x64-1.22.0
+    ln -s lib lib64
+    cd ~/ECICR_build/EmotiEffLib/emotieffcpplib/build
+    cmake .. -DWITH_ONNX=~/ECICR_build/onnxruntime-linux-x64-1.22.0 -DBUILD_SHARED_LIBS=ON
+    make -j$(nproc)
+    #The .so files are in ~/ECICR_build/EmotiEffLib/emotieffcpplib/build/lib
+  else
+    cd ~/ECICR_build/onnxruntime-linux-x64-gpu-1.22.0
+    ln -s lib lib64
+    cd ~/ECICR_build/EmotiEffLib/emotieffcpplib/build
+    cmake .. -DWITH_ONNX=~/ECICR_build/onnxruntime-linux-x64-gpu-1.22.0 -DBUILD_SHARED_LIBS=ON
+    make -j$(nproc)
+    #The .so files are in ~/ECICR_build/EmotiEffLib/emotieffcpplib/build/lib
+  fi
 elif [ "$machine" = "AGXOrin" ]; then
   cd ~/ECICR_build/onnxruntime-linux-aarch64-1.22.0
   ln -s lib lib64
