@@ -160,8 +160,10 @@ else
       wget -O opencv_contrib4.11.zip https://github.com/opencv/opencv_contrib/archive/refs/tags/4.11.0.zip
     fi
   fi
-  unzip opencv4.11.zip
-  unzip opencv_contrib4.11.zip
+
+  #the unzip option -n will skip existing files without prompting. This is useful if you want to avoid overwriting files that have already been extracted.
+  unzip -n opencv4.11.zip
+  unzip -n opencv_contrib4.11.zip
   cd opencv-4.11.0
   mkdir -p build && cd build
   sudo apt -y install libvtk9-dev       #vtk is required to compile opencv_vis module, which is required by EmotiEffLib
@@ -184,7 +186,7 @@ fi
 #I don't know if 3.21.12 is compatible with MediaPipe v0.10.22. So, I install protobuf 3.19.1.
 cd ~/ECICR_build
 wget -O protobuf-all-3.19.1.zip https://github.com/protocolbuffers/protobuf/releases/download/v3.19.1/protobuf-all-3.19.1.zip
-unzip protobuf-all-3.19.1.zip
+unzip -n protobuf-all-3.19.1.zip
 cd ~/ECICR_build/protobuf-3.19.1
 ./configure
 #if I use "make -j $(nproc)", there is a peak of memory usage, which exceeds the RAM+SWAP size on some laptops.
