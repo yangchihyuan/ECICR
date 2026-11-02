@@ -26,7 +26,7 @@ def generate_launch_description():
         # Start the server GUI executable.
         Node(
             package='server_gui',
-            executable='SoloSeniorWatchRobot',
+            executable='ECICR',
             name='server_gui',
             arguments=[
                 '--SettingFile',

@@ -1,10 +1,10 @@
 [Desktop Entry]
 Version=1.0
-Name=SoloSeniorWatchRobot
+Name=ECICR
 Comment=A helper application for a robot nurse
 Path=@SERVER_DIR@
 Exec=./run_ros_server.sh
-Icon=SoloSeniorWatchRobot
+Icon=ECICR
 Terminal=false
 Type=Application
 Categories=Utility;

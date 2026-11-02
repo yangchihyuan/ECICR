@@ -10,6 +10,6 @@ else
   echo "Error: ROS 2 Lyrical is not installed at /opt/ros/lyrical."
   exit 1
 fi
-cd ~/SoloSeniorWatchRobot/ros2_ws
+cd ~/ECICR/ros2_ws
 colcon build --symlink-install \
   --packages-select audio_video_receiver server_gui my_robot_bringup

@@ -1,4 +1,4 @@
-This folder contains the code files for the server side program of SoloSeniorWatchRobot. It provides an Graphic User Interface (GUI) for a user to remotely control the robot's action. The GUI currently looks like the image below and allows a user to send commands to the robot-side's app, which calls Zenbo SDK or Kebbi SDK to execute those commands.
+This folder contains the code files for the server side program of ECICR. It provides an Graphic User Interface (GUI) for a user to remotely control the robot's action. The GUI currently looks like the image below and allows a user to send commands to the robot-side's app, which calls Zenbo SDK or Kebbi SDK to execute those commands.
 
 ![GUI](README_Images/GUI.jpg "GUI")
 
@@ -7,7 +7,7 @@ We create a script file to install our code and all required libraries MediaPipe
 The easiest way to install our program is to execute the following script.
 ```sh
 cd ~
-wget -O install.sh https://raw.githubusercontent.com/yangchihyuan/SoloSeniorWatchRobot/refs/heads/main/Server/install.sh
+wget -O install.sh https://raw.githubusercontent.com/yangchihyuan/ECICR/refs/heads/main/Server/install.sh
 chmod +x install.sh
 ./install.sh
 echo "Don't use sudo ./install.sh. That is wrong."
@@ -145,7 +145,7 @@ You cannot install the pre-built OpenCV and Protocol Buffer packages for Ubuntu 
 
 # Compile the program
 ```sh
-cd ~/SoloSeniorWatchRobot/ros2_ws
+cd ~/ECICR/ros2_ws
 colcon build --packages-select server_gui
 ```
 
@@ -153,7 +153,7 @@ colcon build --packages-select server_gui
 The server-side program is a ROS2-based program. You need to launch the ROS2 first.
 
 ```sh
-cd ~/SoloSeniorWatchRobot/ros2_ws
+cd ~/ECICR/ros2_ws
 source install/setup.bash
-ros2 run server_gui SoloSeniorWatchRobot json/ROGG16_SSWR.json
+ros2 run server_gui ECICR json/ROGG16_SSWR.json
 ```

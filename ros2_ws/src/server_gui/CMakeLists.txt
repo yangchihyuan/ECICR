@@ -50,7 +50,7 @@ function(my_protobuf_generate_cpp PROTO_SRCS PROTO_HDRS PROTO_FILES)
     # Define the output .pb.cc and .pb.h files
     set(PROTO_CC "${CMAKE_CURRENT_BINARY_DIR}/${PROTO_DIR}/${PROTO_BASE}.pb.cc")
     set(PROTO_HH "${CMAKE_CURRENT_BINARY_DIR}/${PROTO_DIR}/${PROTO_BASE}.pb.h")
-    message(STATUS "CMAKE_CURRENT_BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR}")             #CMAKE_CURRENT_BINARY_DIR = /home/chihyuan/SoloSeniorWatchRobot/Server/build
+    message(STATUS "CMAKE_CURRENT_BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR}")             #CMAKE_CURRENT_BINARY_DIR = /home/chihyuan/ECICR/Server/build
 
     # Run protoc to generate the C++ files
     add_custom_command(
@@ -96,7 +96,7 @@ find_package(Qt6 REQUIRED COMPONENTS Core Widgets Network Multimedia MultimediaW
 find_package(ICU REQUIRED COMPONENTS uc)
 
 file(GLOB_RECURSE HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/*.hpp)
-set(SoloSeniorWatchRobot_BUILD_DIR "$ENV{HOME}/SoloSeniorWatchRobot_build")
+set(ECICR_BUILD_DIR "$ENV{HOME}/ECICR_build")
 
 if(CMAKE_SYSTEM_PROCESSOR STREQUAL "aarch64")
     set(ONNX_DIR_NAME "onnxruntime-linux-aarch64-1.22.0")
@@ -104,9 +104,9 @@ else()
     set(ONNX_DIR_NAME "onnxruntime-linux-x64-gpu-1.22.0")
 endif()
 
-set(OLLAMA_HPP_INCLUDE_DIR "${SoloSeniorWatchRobot_BUILD_DIR}/ollama-hpp/include")
-set(ONNX_HPP_INCLUDE_DIR "${SoloSeniorWatchRobot_BUILD_DIR}/${ONNX_DIR_NAME}/include")
-set(SILERO_HPP_INCLUDE_DIR "${SoloSeniorWatchRobot_BUILD_DIR}/silero-vad/examples/cpp")
+set(OLLAMA_HPP_INCLUDE_DIR "${ECICR_BUILD_DIR}/ollama-hpp/include")
+set(ONNX_HPP_INCLUDE_DIR "${ECICR_BUILD_DIR}/${ONNX_DIR_NAME}/include")
+set(SILERO_HPP_INCLUDE_DIR "${ECICR_BUILD_DIR}/silero-vad/examples/cpp")
 set(SOURCES AnythingLLM.cpp
             GetLandmarks.cpp
             JPEG.cpp
@@ -145,13 +145,13 @@ message(STATUS 'PROTO_SRC ${PROTO_SRC}')
 
 # whisper.cpp v1.7.5
 add_library(LIBWHISPER SHARED IMPORTED)
-set(WHISPER_DIR $ENV{HOME}/SoloSeniorWatchRobot_build/whisper.cpp)
+set(WHISPER_DIR $ENV{HOME}/ECICR_build/whisper.cpp)
 set_target_properties(LIBWHISPER PROPERTIES
   IMPORTED_LOCATION "${WHISPER_DIR}/build/src/libwhisper.so")
 target_include_directories(LIBWHISPER INTERFACE "${WHISPER_DIR}/include" "${WHISPER_DIR}/ggml/include" ${WHISPER_DIR}/examples)
 set(WHISPER_EXAMPLE_SOURCES ${WHISPER_DIR}/examples/common.cpp)
 
-add_executable(SoloSeniorWatchRobot ${SOURCES} ${SOURCES2} ${HEADERS} ${WHISPER_EXAMPLE_SOURCES})
+add_executable(ECICR ${SOURCES} ${SOURCES2} ${HEADERS} ${WHISPER_EXAMPLE_SOURCES})
 
 
 
@@ -162,7 +162,7 @@ set(LIBMP_BIN_DIR "${MEDIAPIPE_DIR}/bazel-bin/mediapipe/examples/desktop/${LIBMP
 message(STATUS "USE_GPU: ${USE_GPU}")
 if(USE_GPU)
   set(LIBMP_SHARED_LIBRARY "${LIBMP_BIN_DIR}/${LIBMP_TARGET_NAME}_gpu.so")
-  target_compile_definitions(SoloSeniorWatchRobot
+  target_compile_definitions(ECICR
   PRIVATE
     USE_GPU
   )
@@ -182,28 +182,28 @@ add_library(MP_FORMATS STATIC ${MP_FORMATS_SRC})
 target_include_directories(MP_FORMATS PUBLIC "${MEDIAPIPE_DIR}/bazel-bin")
 target_link_libraries(MP_FORMATS libprotobuf)
 
-target_link_libraries(SoloSeniorWatchRobot MP_FORMATS)
-target_link_libraries(SoloSeniorWatchRobot LIBMP)
+target_link_libraries(ECICR MP_FORMATS)
+target_link_libraries(ECICR LIBMP)
 
 #ICU, International Components for Unicode. Why do I need this?
 #It appears that I need to use the UTF-8 string in Qt6. Really?
-target_link_libraries(SoloSeniorWatchRobot ${ICU_LIBRARIES})
+target_link_libraries(ECICR ${ICU_LIBRARIES})
 
 
 # ONNX
 add_library(LIBONNX SHARED IMPORTED)
-set(ONNX_DIR "${SoloSeniorWatchRobot_BUILD_DIR}/${ONNX_DIR_NAME}")
+set(ONNX_DIR "${ECICR_BUILD_DIR}/${ONNX_DIR_NAME}")
 set_target_properties(LIBONNX PROPERTIES
   IMPORTED_LOCATION "${ONNX_DIR}/lib/libonnxruntime.so")
 
 #EmotiEffNet
 add_library(LIBEmotiEffNet SHARED IMPORTED)      #give the target a name
 set_target_properties(LIBEmotiEffNet PROPERTIES
-  IMPORTED_LOCATION "${SoloSeniorWatchRobot_BUILD_DIR}/EmotiEffLib/emotieffcpplib/build/lib/libemotiefflib.so")
-target_link_libraries(SoloSeniorWatchRobot LIBEmotiEffNet)
-target_include_directories(SoloSeniorWatchRobot PUBLIC "${SoloSeniorWatchRobot_BUILD_DIR}/EmotiEffLib/emotieffcpplib/include"
-  "${SoloSeniorWatchRobot_BUILD_DIR}/EmotiEffLib/emotieffcpplib/3rdparty/xtensor/include"
-  "${SoloSeniorWatchRobot_BUILD_DIR}/EmotiEffLib/emotieffcpplib/3rdparty/xtl/include")
+  IMPORTED_LOCATION "${ECICR_BUILD_DIR}/EmotiEffLib/emotieffcpplib/build/lib/libemotiefflib.so")
+target_link_libraries(ECICR LIBEmotiEffNet)
+target_include_directories(ECICR PUBLIC "${ECICR_BUILD_DIR}/EmotiEffLib/emotieffcpplib/include"
+  "${ECICR_BUILD_DIR}/EmotiEffLib/emotieffcpplib/3rdparty/xtensor/include"
+  "${ECICR_BUILD_DIR}/EmotiEffLib/emotieffcpplib/3rdparty/xtl/include")
 
 #dlib for face recognition
 #The second parameter is the build directory of dlib
@@ -213,19 +213,19 @@ target_include_directories(SoloSeniorWatchRobot PUBLIC "${SoloSeniorWatchRobot_B
 
 #InspireFace
 add_library(LIBINSPIREFACE SHARED IMPORTED)
-set(INSPIREFACE_DIR "$ENV{HOME}/SoloSeniorWatchRobot_build/InspireFace/build/inspireface-linux-ubuntu/InspireFace")
+set(INSPIREFACE_DIR "$ENV{HOME}/ECICR_build/InspireFace/build/inspireface-linux-ubuntu/InspireFace")
 set_target_properties(LIBINSPIREFACE PROPERTIES
   IMPORTED_LOCATION "${INSPIREFACE_DIR}/lib/libInspireFace.so")
-target_include_directories(SoloSeniorWatchRobot PRIVATE "${INSPIREFACE_DIR}/include")
-target_link_libraries(SoloSeniorWatchRobot LIBINSPIREFACE)
+target_include_directories(ECICR PRIVATE "${INSPIREFACE_DIR}/include")
+target_link_libraries(ECICR LIBINSPIREFACE)
 
 #httplib
 add_library(LIBHTTPLIB INTERFACE)
-target_include_directories(LIBHTTPLIB INTERFACE "${SoloSeniorWatchRobot_BUILD_DIR}/cpp-httplib")
+target_include_directories(LIBHTTPLIB INTERFACE "${ECICR_BUILD_DIR}/cpp-httplib")
 #set_target_properties(LIBHTTPLIB PROPERTIES
-#  IMPORTED_LOCATION "${SoloSeniorWatchRobot_BUILD_DIR}/cpp-httplib/httplib.h")
-target_include_directories(SoloSeniorWatchRobot PRIVATE "${SoloSeniorWatchRobot_BUILD_DIR}/cpp-httplib")
-target_link_libraries(SoloSeniorWatchRobot LIBHTTPLIB)
+#  IMPORTED_LOCATION "${ECICR_BUILD_DIR}/cpp-httplib/httplib.h")
+target_include_directories(ECICR PRIVATE "${ECICR_BUILD_DIR}/cpp-httplib")
+target_link_libraries(ECICR LIBHTTPLIB)
 
 # colcon installs the executable under install/..., whereas these libraries
 # intentionally remain in the locally built MediaPipe/AI dependency trees.
@@ -235,11 +235,11 @@ set(ROBOT_NURSE_RUNTIME_LIBRARY_DIRS
   "${LIBMP_BIN_DIR}"
   "${WHISPER_DIR}/build/src"
   "${ONNX_DIR}/lib"
-  "${SoloSeniorWatchRobot_BUILD_DIR}/EmotiEffLib/emotieffcpplib/build/lib"
+  "${ECICR_BUILD_DIR}/EmotiEffLib/emotieffcpplib/build/lib"
   "${INSPIREFACE_DIR}/lib"
 )
 list(JOIN ROBOT_NURSE_RUNTIME_LIBRARY_DIRS ";" ROBOT_NURSE_RUNTIME_RPATH)
-set_target_properties(SoloSeniorWatchRobot PROPERTIES
+set_target_properties(ECICR PROPERTIES
   BUILD_RPATH "${ROBOT_NURSE_RUNTIME_RPATH}"
   INSTALL_RPATH "${ROBOT_NURSE_RUNTIME_RPATH}"
 )
@@ -254,18 +254,18 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/${RO
 #The next line is incorrect because CMAKE_CXX_FLAGS is a global variable rather than a property
 #set_target_properties(${TARGET_NAME} PROPERTIES "CMAKE_CXX_FLAGS" "${CMAKE_CXX_FLAGS}")
 
-target_include_directories(SoloSeniorWatchRobot PRIVATE
+target_include_directories(ECICR PRIVATE
   ${CMAKE_CURRENT_BINARY_DIR}/Zenbo
   ${CMAKE_CURRENT_BINARY_DIR}/Kebbi
-  ${CMAKE_CURRENT_BINARY_DIR}/SoloSeniorWatchRobot_autogen/include
+  ${CMAKE_CURRENT_BINARY_DIR}/ECICR_autogen/include
 )
 
-target_link_libraries(SoloSeniorWatchRobot LIBWHISPER
+target_link_libraries(ECICR LIBWHISPER
     Qt::Core Qt::Widgets Qt::Network
     Qt::Multimedia Qt::MultimediaWidgets ${OpenCV_LIBS} portaudio LIBONNX nlohmann_json::nlohmann_json)
 # ROS 2 Lyrical no longer provides the legacy
 # ament_target_dependencies() CMake helper. Link the exported targets directly.
-target_link_libraries(SoloSeniorWatchRobot
+target_link_libraries(ECICR
   ament_index_cpp::ament_index_cpp
   rclcpp::rclcpp
   sensor_msgs::sensor_msgs__rosidl_typesupport_cpp
@@ -273,24 +273,24 @@ target_link_libraries(SoloSeniorWatchRobot
 
 #set the compile definition
 if(ROBOT_MODEL STREQUAL "Kebbi")
-  target_compile_definitions(SoloSeniorWatchRobot
+  target_compile_definitions(ECICR
     PRIVATE
       USE_KEBBI
   )
-  target_include_directories(SoloSeniorWatchRobot PRIVATE Kebbi)
+  target_include_directories(ECICR PRIVATE Kebbi)
 elseif(ROBOT_MODEL STREQUAL "Zenbo")
-  target_compile_definitions(SoloSeniorWatchRobot
+  target_compile_definitions(ECICR
     PRIVATE
       USE_ZENBO
   )
-  target_include_directories(SoloSeniorWatchRobot PRIVATE Zenbo)
+  target_include_directories(ECICR PRIVATE Zenbo)
 else()
   message(FATAL_ERROR "Please set the robot model")
 endif()
 
 # Keep runtime files next to the ROS package share directory so paths such as
 # json/Setting.json and camera-shutter.wav work when launched with ros2 run.
-install(TARGETS SoloSeniorWatchRobot
+install(TARGETS ECICR
   DESTINATION lib/${PROJECT_NAME})
 install(DIRECTORY
   Eng_videos Images LLM Videos eng_images json Kebbi Zenbo
@@ -298,7 +298,7 @@ install(DIRECTORY
   DESTINATION share/${PROJECT_NAME}
   OPTIONAL)
 install(FILES
-  camera-shutter.wav SoloSeniorWatchRobot.png
+  camera-shutter.wav ECICR.png
   yolo11n-pose.onnx yolo11n.onnx
   PatientTitle_Chinese.txt PatientTitle_English.txt
   Sentence_Chinese.txt Sentence_English.txt Sentences_DirtyJokes.txt

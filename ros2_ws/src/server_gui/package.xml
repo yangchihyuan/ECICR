@@ -3,7 +3,7 @@
 <package format="3">
   <name>server_gui</name>
   <version>0.1.0</version>
-  <description>Qt GUI and ROS 2 integration package for SoloSeniorWatchRobot.</description>
+  <description>Qt GUI and ROS 2 integration package for ECICR.</description>
   <maintainer email="cyyang@cgu.edu.tw">chihyuan</maintainer>
   <license>TODO</license>
 

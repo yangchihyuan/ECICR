@@ -35,13 +35,13 @@ int main(int argc, char *argv[])
         ament_index_cpp::get_package_share_directory("server_gui"));
     QDir::setCurrent(packageShareDirectory);
     auto rosNode = rclcpp::Node::make_shared("server_gui");
-    QCoreApplication::setApplicationName("SoloSeniorWatchRobot");
+    QCoreApplication::setApplicationName("ECICR");
     QCoreApplication::setApplicationVersion("2026.10.04");
     //It does not work. My application does not have a icon.
 //    app.setWindowIcon(QIcon(":/ZenboNurse.png"));
 
     // Suppose the icon is located in the share directory of the package
-    QString iconPath = packageShareDirectory + "/SoloSeniorWatchRobot.png";
+    QString iconPath = packageShareDirectory + "/ECICR.png";
     app.setWindowIcon(QIcon(iconPath));
 
     QCommandLineParser parser;

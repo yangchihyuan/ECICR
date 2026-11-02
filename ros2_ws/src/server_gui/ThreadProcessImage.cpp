@@ -51,7 +51,7 @@ ThreadProcessImage::ThreadProcessImage()
     string modelName = EmotiEffLib::getSupportedModels(backend)[0];
     string ext = ".onnx";
     string Homepath(getenv("HOME"));
-    string emotiEffLibRootDir = Homepath + "/SoloSeniorWatchRobot_build/EmotiEffLib";
+    string emotiEffLibRootDir = Homepath + "/ECICR_build/EmotiEffLib";
     string modelPath = emotiEffLibRootDir + "/models/affectnet_emotions/onnx/" + modelName + ext;
     fer = EmotiEffLib::EmotiEffLibRecognizer::createInstance(backend, modelPath);
 
@@ -80,7 +80,7 @@ ThreadProcessImage::ThreadProcessImage()
     libmp_pose->AddOutputStream("output_video");
     libmp_pose->Start();
 
-    string InspireFaceModelPath = Homepath + "/SoloSeniorWatchRobot_build/InspireFace/test_res/pack/Pikachu";
+    string InspireFaceModelPath = Homepath + "/ECICR_build/InspireFace/test_res/pack/Pikachu";
     const char *InspireFaceModelPath_cstr = InspireFaceModelPath.c_str();
     if (HFLaunchInspireFace(InspireFaceModelPath_cstr) != HSUCCEED)
     {
