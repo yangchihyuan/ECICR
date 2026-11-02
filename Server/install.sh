@@ -9,7 +9,7 @@ read -p "How large is your RAM + swap (GiB)?" RAMSize
 if (( $(echo "$RAMSize < 32" | bc -l) )); then
   echo "You had better have 32G to compile the ECICR program. Otherwise, some applications may not killed during installation. If you don't have enough RAM, enlarge your swap."
   read -p "Do you want to enlarge your swap? [Y/n]" EnlargeSwap
-  if ! [[ "$EnlargeSwap" == "Y" || "$EnlargeSwap" == "y" ]]; then
+  if [[ -z "$EnlargeSwap" || "$EnlargeSwap" =~ ^[Yy]$ ]]; then
     read -p "Enter the new swap size (GiB):" NewSwapSize
     # check whether the input is a valid number
     if ! [[ "$NewSwapSize" =~ ^[0-9]+(\.[0-9]+)?$ ]]; then
@@ -22,10 +22,11 @@ if (( $(echo "$RAMSize < 32" | bc -l) )); then
       sudo chmod 600 /swap.img
       sudo mkswap /swap.img
       sudo swapon /swap.img
+      echo "Swap size has been changed to ${NewSwapSize}G."
     fi
   fi
   read -p "Do you want to continue? [Y/n]" Continue
-  if ! [[ "$Continue" == "Y" || "$Continue" == "y" ]]; then
+  if [[ -z "$Continue" || "$Continue" =~ ^[Yy]$ ]]; then
     exit
   fi
 fi
@@ -56,17 +57,17 @@ else
 fi
 
 if [ "$machine" = "PC" ]; then
-  read -p "Is your secure boot off in your motherboard's UEFI setting? [y/n]" SecureBoot
-  if ! [[ "$SecureBoot" == "Y" || "$SecureBoot" == "y" ]]; then
-    echo "This install.sh script cannot fully automatically install a Nvidia GPU driver because your UEFI secure boot is on. If you want to use this instal.sh to fully automatically install a NVidia GPU driver, you need to set your UEFI secure boot off. Otherwise, you need to install the Nvidia GPU driver manually."
-    read -p "Do you want to stop the install.sh? [y/n]" StopInstall
-    if ! [[ "$StopInstall" == "Y" || "$StopInstall" == "y" ]]; then
-      echo "You can continue to install the ECICR, but you need to install the Nvidia GPU driver manually after the installation."
-    else
-      echo "You can run this install.sh again after you set your UEFI secure boot off."
-      exit  #stop the installation script
-    fi  
-  fi
+#  read -p "Is your secure boot off in your motherboard's UEFI setting? [y/n]" SecureBoot
+#  if [[ -z "$SecureBoot" || "$SecureBoot" =~ ^[Nn]$ ]]; then
+#    echo "This install.sh script cannot fully automatically install a Nvidia GPU driver because your UEFI secure boot is on. If you want to use this instal.sh to fully automatically install a NVidia GPU driver, you need to set your UEFI secure boot off. Otherwise, you need to install the Nvidia GPU driver manually."
+#    read -p "Do you want to stop the install.sh? [y/n]" StopInstall
+#    if [[ -z "$StopInstall" || "$StopInstall" =~ ^[Nn]$ ]]; then
+#      echo "You can continue to install the ECICR, but you need to install the Nvidia GPU driver manually after the installation."
+#    else
+#      echo "You can run this install.sh again after you set your UEFI secure boot off."
+#      exit  #stop the installation script
+#    fi  
+#  fi
 
   read -p "How large is your VRAM size in GB?" VRAMSize
 fi
@@ -349,7 +350,7 @@ else
 fi
 
 #EmotiEffLib needs libopenblas-dev
-sudo apt install libopenblas-dev
+sudo apt install libopenblas-dev -y
 
 #EmotiEffLib
 cd ~/ECICR_build
