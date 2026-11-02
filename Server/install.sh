@@ -464,7 +464,7 @@ git checkout v0.34.0
 # 1. Enable the Ubuntu Universe repository
 sudo apt install software-properties-common -y
 # The "universe" repository, which contains thousands of free, open-source software packages maintained by the Linux community rather than Canonical
-sudo add-apt-repository universe
+sudo add-apt-repository -y universe
 
 # 2. Download and add the official ROS 2 GPG key
 sudo apt update && sudo apt install curl -y
@@ -589,8 +589,8 @@ curl -fsSL https://cdn.anythingllm.com/latest/installer.sh -o installer.sh
 # Make the script executable
 chmod +x installer.sh
  
-# Run the script
-./installer.sh
+# Run the script. Give it a default y to answer the question.
+echo "y" | ./installer.sh
 
 
 ##############################
