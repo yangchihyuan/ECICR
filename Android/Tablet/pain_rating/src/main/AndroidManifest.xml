@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <uses-permission android:name="android.permission.INTERNET" />
+
+    <application
+        android:allowBackup="true"
+        android:label="@string/app_name"
+        android:theme="@style/Theme.Tablet">
+
+        <!-- MainActivity: home screen (two image buttons) -->
+        <activity android:name=".MainActivity"
+            android:exported="true"
+            android:screenOrientation="landscape">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <!-- PainActivity: use the full rating scale image and determine selection by coordinates -->
+        <activity android:name=".PainActivity" />
+
+        <!-- VideoActivity: play a video, then automatically return to the home screen -->
+        <activity android:name=".VideoActivity" />
+        <activity android:name=".FaceResultActivity" />
+        <activity android:name=".NetworkSettingActivity" />
+
+    </application>
+
+</manifest>

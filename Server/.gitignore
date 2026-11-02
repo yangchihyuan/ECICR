@@ -1,0 +1,12 @@
+build/
+# I cannot ignore the mediapipe folder because libmp is under the mediapipe/examples folder
+# mediapipe/
+Videos/
+Progress/
+Data/
+log/
+
+#file downloaded from the internet
+dlib_face_recognition_resnet_model_v1.dat
+yolo11n-pose.onnx
+yolo11n-pose.pt
