@@ -1,4 +1,5 @@
 #!/bin/bash
+set -Ee -o pipefail
 
 #Nov 2, 2026
 #Install ECICR to Ubuntu 26.04.1
@@ -6,6 +7,11 @@
 #Project: ECICR
 
 read -p "How large is your RAM + swap (GiB)?" RAMSize
+if ! [[ "$RAMSize" =~ ^[0-9]+([.][0-9]+)?$ ]]; then
+  echo "Error: RAMSize must be a non-negative number."
+  exit 1
+fi
+
 if (( $(echo "$RAMSize < 32" | bc -l) )); then
   echo "You had better have 32G to compile the ECICR program. Otherwise, some applications may not killed during installation. If you don't have enough RAM, enlarge your swap."
   read -p "Do you want to enlarge your swap? [Y/n]" EnlargeSwap
@@ -71,7 +77,12 @@ if [ "$machine" = "PC" ]; then
 #    fi  
 #  fi
 
-  read -p "How large is your VRAM size in GB?" VRAMSize
+  read -r -p "How large is your VRAM size in GB? " VRAMSize
+
+  if ! [[ "$VRAMSize" =~ ^[0-9]+$ ]]; then
+    echo "Error: VRAMSize must be a non-negative integer."
+    exit 1
+  fi
 fi
 
 read -p "What is the robot model you use? [Zenbo/Kebbi/ZenboJrII]" RobotModel
@@ -112,7 +123,7 @@ sudo apt update
 sudo apt -y install libgtk-3-dev 
 
 #create the working directory without deleting downloaded archives
-mkdir -p ECICR_build
+mkdir -p ~/ECICR_build
 
 #sudo apt -y install cmake
 
@@ -325,13 +336,13 @@ fi
 #onnx
 cd ~/ECICR_build
 if [ "$machine" = "PC" ]; then
-  if ((VRAMSize>=0)); then
+  if ((VRAMSize > 0)); then
     wget -O onnxruntime-linux-x64-gpu-1.22.0.tgz https://github.com/microsoft/onnxruntime/releases/download/v1.22.0/onnxruntime-linux-x64-gpu-1.22.0.tgz
     tar -xvzf onnxruntime-linux-x64-gpu-1.22.0.tgz
   else
     wget -O onnxruntime-linux-x64-1.22.0.tgz https://github.com/microsoft/onnxruntime/releases/download/v1.22.0/onnxruntime-linux-x64-1.22.0.tgz
     tar -xvzf onnxruntime-linux-x64-1.22.0.tgz
-  if  
+  fi  
 elif [ "$machine" = "AGXOrin" ]; then
   wget -O onnxruntime-linux-aarch64-1.22.0.tgz https://github.com/microsoft/onnxruntime/releases/download/v1.22.0/onnxruntime-linux-aarch64-1.22.0.tgz
   tar -xvzf onnxruntime-linux-aarch64-1.22.0.tgz
@@ -367,21 +378,22 @@ git clone https://github.com/sb-ai-lab/EmotiEffLib.git
 cd EmotiEffLib
 git submodule update --init --recursive
 cd emotieffcpplib
-mkdir build && cd build
+mkdir -p build
+cd build
 #I am not sure if this command works. Check it later.
 #Their CMakeLists.txt file needs /home/chihyuan/ECICR_build/onnxruntime-linux-x64-gpu-1.22.0/lib64, but there is no lib64 folder in onnxruntime-linux-x64-gpu-1.22.0. There is only a lib folder.
 #So, I create a symbolic link lib64 to lib
 if [ "$machine" = "PC" ]; then
   if ((VRAMSize==0)); then
     cd ~/ECICR_build/onnxruntime-linux-x64-1.22.0
-    ln -s lib lib64
+    ln -sfn lib lib64
     cd ~/ECICR_build/EmotiEffLib/emotieffcpplib/build
     cmake .. -DWITH_ONNX=~/ECICR_build/onnxruntime-linux-x64-1.22.0 -DBUILD_SHARED_LIBS=ON
     make -j$(nproc)
     #The .so files are in ~/ECICR_build/EmotiEffLib/emotieffcpplib/build/lib
   else
     cd ~/ECICR_build/onnxruntime-linux-x64-gpu-1.22.0
-    ln -s lib lib64
+    ln -sfn lib lib64
     cd ~/ECICR_build/EmotiEffLib/emotieffcpplib/build
     cmake .. -DWITH_ONNX=~/ECICR_build/onnxruntime-linux-x64-gpu-1.22.0 -DBUILD_SHARED_LIBS=ON
     make -j$(nproc)
@@ -389,7 +401,7 @@ if [ "$machine" = "PC" ]; then
   fi
 elif [ "$machine" = "AGXOrin" ]; then
   cd ~/ECICR_build/onnxruntime-linux-aarch64-1.22.0
-  ln -s lib lib64
+  ln -sfn lib lib64
   cd ~/ECICR_build/EmotiEffLib/emotieffcpplib/build
   cmake .. -DWITH_ONNX=~/ECICR_build/onnxruntime-linux-aarch64-1.22.0 -DBUILD_SHARED_LIBS=ON
   make -j$(nproc)
@@ -445,9 +457,9 @@ sed -i 's|this->cli->Post("/api/chat", request_string, "application/json", strea
 #if [ "$machine" = "PC" ]; then
   cd ~/ECICR_build/
   git clone https://github.com/HyperInspire/InspireFace.git
+  cd InspireFace
   checkout v1.2.3
   # Must enter this directory
-  cd InspireFace
   # Clone the repository and pull submodules
   git clone --recurse-submodules https://github.com/tunmx/inspireface-3rdparty.git 3rdparty
 
@@ -511,7 +523,7 @@ cp -r ~/mediapipe/bazel-bin/mediapipe/examples/desktop/libmp/libmp_gpu.so.runfil
 if [ -d "temp" ]; then
     rm -rf temp
 fi
-mkdir temp
+mkdir -p temp
 # this file mediapipe/modules/hand_landmark/handedness.txt is required to run holistic trackiing
 find ~/mediapipe/mediapipe -type f \( -name "*.txt" \) -exec cp --parents {} temp \;
 cp -r temp/home/$USER/mediapipe/mediapipe .
@@ -537,14 +549,14 @@ cd ~/ECICR_build
 #for play video and audio in Qt Multimedia
 #Ubuntu 26.04 removed the GTK2 package libcanberra-gtk-module
 if [ "$VERSION_ID" == "26.04" ]; then
-  sudo apt install  libcanberra-gtk3-module   #for system sound support in Qt Multimedia
+  sudo apt install -y libcanberra-gtk3-module   #for system sound support in Qt Multimedia
 elif [ "$VERSION_ID" == "24.04" ]; then
-  sudo apt install libcanberra-gtk-module libcanberra-gtk3-module   #for system sound support in Qt Multimedia
+  sudo apt install -y libcanberra-gtk-module libcanberra-gtk3-module   #for system sound support in Qt Multimedia
 else
   if [ "$machine" = "AGXOrin" ]; then
-    sudo apt install gstreamer1.0-tools gstreamer1.0-nice gstreamer1.0-qt5 gstreamer1.0-plugins-base
-    sudo apt install gstreamer1.0-plugins-good gstreamer1.0-plugins-bad gstreamer1.0-plugins-ugly
-    sudo apt install gstreamer1.0-libav
+    sudo apt install -y gstreamer1.0-tools gstreamer1.0-nice gstreamer1.0-qt5 gstreamer1.0-plugins-base
+    sudo apt install -y gstreamer1.0-plugins-good gstreamer1.0-plugins-bad gstreamer1.0-plugins-ugly
+    sudo apt install -y gstreamer1.0-libav
   fi 
 fi
 
