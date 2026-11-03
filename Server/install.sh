@@ -381,7 +381,7 @@ cd emotieffcpplib
 mkdir -p build
 cd build
 #I am not sure if this command works. Check it later.
-#Their CMakeLists.txt file needs /home/chihyuan/$BUILD_DIR/onnxruntime-linux-x64-gpu-1.22.0/lib64, but there is no lib64 folder in onnxruntime-linux-x64-gpu-1.22.0. There is only a lib folder.
+#Their CMakeLists.txt file needs onnxruntime lib folder, but there is no lib64 folder.
 #So, I create a symbolic link lib64 to lib
 if [ "$machine" = "PC" ]; then
   if ((VRAMSize==0)); then
@@ -566,10 +566,10 @@ fi
 sudo cp ~/"$PROJECT_NAME/Server/$PROJECT_NAME.png" /usr/share/pixmaps/"$PROJECT_NAME.png"
 mkdir -p ~/.local/share/applications/
 
-#replace the @SERVER_DIR@ in ECICR.desktop with the actual path of the Server directory, and copy it to ~/.local/share/applications/
+#replace the @SERVER_DIR@ in ${PROJECT_NAME}.desktop with the actual path of the Server directory, and copy it to ~/.local/share/applications/
 sed "s|@SERVER_DIR@|$HOME/$PROJECT_NAME/Server|g" \
-  "$PROJECT_NAME.desktop" \
-  > ~/.local/share/applications/"$PROJECT_NAME.desktop"
+  "${PROJECT_NAME}.desktop" \
+  > ~/.local/share/applications/"${PROJECT_NAME}.desktop"
 
 #update desktop database
 update-desktop-database ~/.local/share/applications/
