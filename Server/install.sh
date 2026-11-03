@@ -27,6 +27,8 @@ if (( $(echo "$RAMSize < 32" | bc -l) )); then
   fi
   read -p "Do you want to continue? [Y/n]" Continue
   if [[ -z "$Continue" || "$Continue" =~ ^[Yy]$ ]]; then
+    echo "Continuing the installation..."
+  else
     exit
   fi
 fi
