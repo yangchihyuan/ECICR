@@ -517,7 +517,7 @@ sudo apt install python3-colcon-common-extensions build-essential -y
 
 #Build our own program. We no longer need the program because the program has been moved to the ros2 system. 
 cd ~/ECICR/Server
-./build_project.sh $RobotModel
+./build_project.sh "$RobotModel" "$VRAMSize"
 #copy the required mediapipe files to Server
 cp -r ~/mediapipe/bazel-bin/mediapipe/examples/desktop/libmp/libmp_gpu.so.runfiles/mediapipe/mediapipe .
 if [ -d "temp" ]; then
