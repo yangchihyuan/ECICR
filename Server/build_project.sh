@@ -52,7 +52,11 @@ else
   echo "Error: ROS 2 Lyrical is not installed at /opt/ros/lyrical."
   exit 1
 fi
-cd ~/ECICR/ros2_ws
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PARENT_DIR="$(dirname "$SCRIPT_DIR")"
+
+cd "$PARENT_DIR"/ros2_ws
 colcon build --symlink-install \
   --packages-select audio_video_receiver server_gui my_robot_bringup \
   --cmake-args \
