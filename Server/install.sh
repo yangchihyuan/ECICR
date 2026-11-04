@@ -134,7 +134,7 @@ elif [ "$machine" = "AGXOrin" ]; then
   #Snap's cmake does not work on AGX Orin because the the AGX Orin Ubuntu does not a complete SELinux system.
   #The SELinux service is initialzed, but required componenets are missing, which leads to a failure of snap's sandbox.
   #sudo snap install cmake --classic   # version 4.2.2 will be installed
-  cd ~/"$BUILD_DIR"
+  cd "$BUILD_DIR"
   # Download the official Linux installer script
   wget https://github.com/Kitware/CMake/releases/download/v3.31.3/cmake-3.31.3-linux-aarch64.sh
 
@@ -147,7 +147,7 @@ fi
 
 #install OpenCV 4.11, which is required by MediaPipe
 #install OpenCV 4.11 first, because it requires to key in sudo password again
-cd ~/"$BUILD_DIR"
+cd "$BUILD_DIR"
 
 InstalledOpenCVVersion=""
 if command -v opencv_version >/dev/null 2>&1; then
@@ -197,10 +197,10 @@ fi
 #intall protobuf 3.19.1
 #For Ubuntu 26.04.1, the default protobuf version is 3.21.12.
 #I don't know if 3.21.12 is compatible with MediaPipe v0.10.22. So, I install protobuf 3.19.1.
-cd ~/"$BUILD_DIR"
+cd "$BUILD_DIR"
 wget -O protobuf-all-3.19.1.zip https://github.com/protocolbuffers/protobuf/releases/download/v3.19.1/protobuf-all-3.19.1.zip
 unzip -n protobuf-all-3.19.1.zip
-cd ~/"$BUILD_DIR"/protobuf-3.19.1
+cd "$BUILD_DIR"/protobuf-3.19.1
 ./configure
 #if I use "make -j $(nproc)", there is a peak of memory usage, which exceeds the RAM+SWAP size on some laptops.
 make -j 10    #prevent memory peak usage
