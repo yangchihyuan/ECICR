@@ -101,7 +101,7 @@ set(ECICR_BUILD_DIR "$ENV{HOME}/ECICR_build")
 
 if(CMAKE_SYSTEM_PROCESSOR STREQUAL "aarch64")
     set(ONNX_DIR_NAME "onnxruntime-linux-aarch64-1.22.0")
-elseif(USE_GPU)
+elseif(USE_EXTERNAL_GPU)
     set(ONNX_DIR_NAME "onnxruntime-linux-x64-gpu-1.22.0")
 else()
     set(ONNX_DIR_NAME "onnxruntime-linux-x64-1.22.0")
