@@ -348,8 +348,12 @@ elif [ "$machine" = "AGXOrin" ]; then
   tar -xvzf onnxruntime-linux-aarch64-1.22.0.tgz
 fi
 
-#silero-v
+#silero-vad
 cd "$BUILD_DIR"
+#we need to remove it first otherwise the git clone command will fail because the folder already exists.
+if [ -d "silero-vad" ]; then
+    rm -rf silero-vad
+fi
 git clone https://github.com/snakers4/silero-vad.git
 
 #The EmotiEffLib uses a 3rd party library 3rdparty/xtl/CMakeLists.txt, which requires CMake 3.29 or above. Ubuntu 26.04.1 has CMake 4.2.2, which is enough for EmotiEffLib. But Ubuntu 24.04 has CMake 3.22.1, which is not enough for EmotiEffLib. So, we need to install CMake 4.2.2 on Ubuntu 24.04.
@@ -374,6 +378,10 @@ sudo apt install libopenblas-dev -y
 
 #EmotiEffLib
 cd "$BUILD_DIR"
+#we need to remove it first otherwise the git clone command will fail because the folder already exists.
+if [ -d "EmotiEffLib" ]; then
+    rm -rf EmotiEffLib
+fi
 git clone https://github.com/sb-ai-lab/EmotiEffLib.git
 cd EmotiEffLib
 git submodule update --init --recursive
@@ -432,6 +440,9 @@ fi
 
 #ollama-hpp
 cd "$BUILD_DIR"
+if [ -d "ollama-hpp" ]; then
+    rm -rf ollama-hpp
+fi
 git clone https://github.com/jmont-dev/ollama-hpp.git
 cd "$BUILD_DIR/ollama-hpp"
 git checkout v0.9.5
@@ -456,6 +467,9 @@ sed -i 's|this->cli->Post("/api/chat", request_string, "application/json", strea
 #I need to test it on AGX Orin later. If there is a problem, I will try to fix it and update the code.
 #if [ "$machine" = "PC" ]; then
   cd "$BUILD_DIR/"
+  if [ -d "InspireFace" ]; then
+      rm -rf InspireFace
+  fi
   git clone https://github.com/HyperInspire/InspireFace.git
   cd InspireFace
   git checkout v1.2.3
@@ -487,6 +501,9 @@ sed -i 's|this->cli->Post("/api/chat", request_string, "application/json", strea
 
 #cpp-httplib
 cd "$BUILD_DIR"
+if [ -d "cpp-httplib" ]; then
+    rm -rf cpp-httplib
+fi
 git clone https://github.com/yhirose/cpp-httplib.git
 cd cpp-httplib
 git checkout v0.34.0
