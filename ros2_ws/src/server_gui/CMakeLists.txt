@@ -76,7 +76,7 @@ endfunction()
 
 
 #set the custom path for the find_package
-list(APPEND CMAKE_PREFIX_PATH "usr/local")
+list(APPEND CMAKE_PREFIX_PATH "/usr/local")
 
 # use Mediapipe's Protobuf
 set(MEDIAPIPE_DIR "$ENV{HOME}/mediapipe")

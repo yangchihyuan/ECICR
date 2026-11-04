@@ -312,10 +312,12 @@ git clone https://github.com/ggerganov/whisper.cpp.git
 cd "$BUILD_DIR/whisper.cpp"
 git checkout v1.7.5
 if ((VRAMSize==0)); then
+  USE_EXTERNAL_GPU=OFF  #no GPU
   bash ./models/download-ggml-model.sh tiny
   cmake -B build
   cmake --build build -j10 --config Release
 else
+  USE_EXTERNAL_GPU=ON  #no GPU
   if [ "$machine" = "PC" ]; then
     sudo apt -y install nvidia-cuda-toolkit
   fi
@@ -533,8 +535,10 @@ grep -qxF "source /opt/ros/lyrical/setup.bash" ~/.bashrc || echo "source /opt/ro
 sudo apt install python3-colcon-common-extensions build-essential -y
 
 #Build our own program. We no longer need the program because the program has been moved to the ros2 system. 
-cd ~/"$PROJECT_NAME/Server"
-./build_project.sh "$RobotModel" "$VRAMSize"
+#We no longer need it because now we build the ROS 2
+#cd ~/"$PROJECT_NAME/Server"
+#./build_project.sh "$RobotModel" "$VRAMSize"
+
 #copy the required mediapipe files to Server
 cp -r ~/mediapipe/bazel-bin/mediapipe/examples/desktop/libmp/libmp_gpu.so.runfiles/mediapipe/mediapipe .
 if [ -d "temp" ]; then
@@ -594,6 +598,8 @@ update-desktop-database ~/.local/share/applications/
 #you need to logout and login again to let the desktop file work. After that, you can launch the program by clicking the icon "Robot Nurse Helper" on your desktop or application menu.
 
 #Yolov11-pose needs CuDNN to run its onnx file. It is only need to install in PC. The AGX Orin has its own GPU acceleration library, which is compatible with CuDNN, so we don't need to install CuDNN on AGX Orin.
+#I need to update here because we no longer use Ubuntu 24.04. The keyring becomes different.
+#I have not figure it out.
 if [ "$machine" = "PC" ]; then
   cd "$BUILD_DIR"
   # Download Ubuntu 24.04 spcific keyring
@@ -621,8 +627,10 @@ else
 fi
 cd ~/"$PROJECT_NAME/ros2_ws"
 colcon build --symlink-install \
-  --packages-select audio_video_receiver server_gui my_robot_bringup
-
+  --packages-select audio_video_receiver server_gui my_robot_bringup \
+  --cmake-args \
+    -DROBOT_MODEL="$RobotModel" \
+    -DUSE_EXTERNAL_GPU="$USE_EXTERNAL_GPU"
 
 ##############################
 #install AnythingLLM for RAG
