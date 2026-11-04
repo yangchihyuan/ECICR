@@ -311,9 +311,10 @@ fi
 git clone https://github.com/ggerganov/whisper.cpp.git
 cd "$BUILD_DIR/whisper.cpp"
 git checkout v1.7.5
+#Download the tiny model first. If the user has enough VRAM, we will download a larger model later.
+bash ./models/download-ggml-model.sh tiny
 if ((VRAMSize==0)); then
   USE_EXTERNAL_GPU=OFF  #no GPU
-  bash ./models/download-ggml-model.sh tiny
   cmake -B build
   cmake --build build -j10 --config Release
 else
