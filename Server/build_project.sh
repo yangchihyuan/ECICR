@@ -39,9 +39,9 @@ case "$RobotModel" in
 esac
 
 if (( VRAMSize > 0 )); then
-  USE_GPU=ON
+  USE_EXTERNAL_GPU=ON
 else
-  USE_GPU=OFF
+  USE_EXTERNAL_GPU=OFF
 fi
 
 # Build the ROS 2 workspace
@@ -61,4 +61,4 @@ colcon build --symlink-install \
   --packages-select audio_video_receiver server_gui my_robot_bringup \
   --cmake-args \
     -DROBOT_MODEL="$CMAKE_ROBOT_MODEL" \
-    -DUSE_GPU="$USE_GPU"
+    -DUSE_EXTERNAL_GPU="$USE_EXTERNAL_GPU"

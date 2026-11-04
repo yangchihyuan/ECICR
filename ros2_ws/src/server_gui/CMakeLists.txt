@@ -27,6 +27,7 @@ if(NOT nlohmann_json_FOUND)
 endif()
 
 option(USE_GPU "USE GPU" ON)
+option(USE_EXTERNAL_GPU "USE EXTERNAL_GPU" ON)
 option(COMPILE_WITH_G_FLAG "COMPILE WITH G FLAG" ON)   #if OFF, executable size 2.5MB; if ON, 88MB
 if(NOT DEFINED ROBOT_MODEL)
   set(ROBOT_MODEL Kebbi)    #default robot model is Kebbi
