@@ -589,7 +589,7 @@ mkdir -p ~/.local/share/applications/
 
 #replace the @SERVER_DIR@ in ${PROJECT_NAME}.desktop with the actual path of the Server directory, and copy it to ~/.local/share/applications/
 sed "s|@SERVER_DIR@|$HOME/$PROJECT_NAME/Server|g" \
-  "${PROJECT_NAME}.desktop" \
+  "$HOME/$PROJECT_NAME/Server/${PROJECT_NAME}.desktop" \
   > ~/.local/share/applications/"${PROJECT_NAME}.desktop"
 
 #update desktop database
