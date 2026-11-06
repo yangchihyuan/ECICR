@@ -331,14 +331,31 @@ else
       sudo apt-get -y install cuda-toolkit-12-9
       echo 'export PATH=/usr/local/cuda-12.9/bin:$PATH' >> ~/.bashrc
       echo 'export LD_LIBRARY_PATH=/usr/local/cuda-12.9/lib64:$LD_LIBRARY_PATH' >> ~/.bashrc
+
+      CUDA_LINK="/usr/local/cuda"
+
+      #If it is a upgrade from a previous CUDA version, we need to remove the existing symbolic link and create a new one.
+      if [ -e "$CUDA_LINK" ] || [ -L "$CUDA_LINK" ]; then
+        echo "Existing symbolic link: $(readlink "$CUDA_LINK")"
+        sudo rm "$CUDA_LINK"
+      fi
+      sudo ln -s /usr/local/cuda-12.9 "$CUDA_LINK"
+
+      # Select the CUDA 12.9 compiler in this installer shell. This matters
+      # when /usr/bin/nvcc belongs to an older toolkit (for example 12.4).
+      export CUDA_HOME=/usr/local/cuda-12.9
+      export PATH="$CUDA_HOME/bin:$PATH"
+      export LD_LIBRARY_PATH="$CUDA_HOME/lib64:${LD_LIBRARY_PATH:-}"
+      export CUDACXX="$CUDA_HOME/bin/nvcc"
+
       source ~/.bashrc
-      nvcc --version
+      "$CUDACXX" --version
     else
       #The Ubuntu 26.04.1 has nvidia-cuda-toolkit 12.5, which does not support RTX 5000 series GPUs and 
       sudo apt -y install nvidia-cuda-toolkit
     fi
   fi
-  
+
   if ((VRAMSize==2)); then
     bash ./models/download-ggml-model.sh small
   else
@@ -346,10 +363,25 @@ else
   fi
   if [ "$machine" = "AGXOrin" ]; then
     #set up the ncvv path
-    export PATH=/usr/local/cuda/bin:$PATH
-    export LD_LIBRARY_PATH=/usr/local/cuda/lib64:$LD_LIBRARY_PATH  
+    export CUDA_HOME=/usr/local/cuda
+    export PATH="$CUDA_HOME/bin:$PATH"
+    export LD_LIBRARY_PATH="$CUDA_HOME/lib64:${LD_LIBRARY_PATH:-}"
+    export CUDACXX="$CUDA_HOME/bin/nvcc"
   fi
-  cmake -B build -DGGML_CUDA=1
+  # Reconfigure with the selected compiler if this build directory was
+  # previously configured with another nvcc.
+  CUDA_CMAKE_ARGS=()
+  if [[ -n "${CUDACXX:-}" ]]; then
+    if [[ ! -x "$CUDACXX" ]]; then
+      echo "Error: CUDA compiler is not executable: $CUDACXX" >&2
+      exit 1
+    fi
+    echo "Using CUDA compiler: $CUDACXX"
+    echo "Resolved CUDA compiler: $(readlink -f "$CUDACXX")"
+    "$CUDACXX" --version
+    CUDA_CMAKE_ARGS+=("-DCMAKE_CUDA_COMPILER:FILEPATH=$CUDACXX")
+  fi
+  cmake -S . -B build -DGGML_CUDA=1 "${CUDA_CMAKE_ARGS[@]}"
   cmake --build build -j10 --config Release    #Don't use -j, there are 20 cores in my laptop, which will cause a peak memory usage
 fi
 
