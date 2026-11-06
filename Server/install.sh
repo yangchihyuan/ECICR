@@ -77,6 +77,10 @@ if [ "$machine" = "PC" ]; then
 #    fi  
 #  fi
 
+  read -r -p "What is your GPU model? [3050/4050/4060/4070/4080/4090/5050/5080]" GPUModel
+
+  GPUModelFirstTwo="${GPUModel:0:2}"
+
   read -r -p "How large is your VRAM size in GB? " VRAMSize
 
   if ! [[ "$VRAMSize" =~ ^[0-9]+$ ]]; then
@@ -318,10 +322,23 @@ if ((VRAMSize==0)); then
   cmake -B build
   cmake --build build -j10 --config Release
 else
-  USE_EXTERNAL_GPU=ON  #no GPU
+  USE_EXTERNAL_GPU=ON  #Use external GPU
   if [ "$machine" = "PC" ]; then
-    sudo apt -y install nvidia-cuda-toolkit
+    if [[ "$GPUModelFirstTwo" == "50" ]]; then
+      wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2204/x86_64/cuda-keyring_1.1-1_all.deb
+      sudo dpkg -i cuda-keyring_1.1-1_all.deb
+      sudo apt-get update
+      sudo apt-get -y install cuda-toolkit-12-9
+      echo 'export PATH=/usr/local/cuda-12.9/bin:$PATH' >> ~/.bashrc
+      echo 'export LD_LIBRARY_PATH=/usr/local/cuda-12.9/lib64:$LD_LIBRARY_PATH' >> ~/.bashrc
+      source ~/.bashrc
+      nvcc --version
+    else
+      #The Ubuntu 26.04.1 has nvidia-cuda-toolkit 12.5, which does not support RTX 5000 series GPUs and 
+      sudo apt -y install nvidia-cuda-toolkit
+    fi
   fi
+  
   if ((VRAMSize==2)); then
     bash ./models/download-ggml-model.sh small
   else
@@ -604,6 +621,7 @@ update-desktop-database ~/.local/share/applications/
 if [ "$machine" = "PC" ]; then
   cd "$BUILD_DIR"
   # Download Ubuntu 24.04 spcific keyring
+
   wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2404/x86_64/cuda-keyring_1.1-1_all.deb
   # Install keyring
   sudo dpkg -i cuda-keyring_1.1-1_all.deb
