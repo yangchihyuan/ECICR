@@ -113,7 +113,8 @@ fi
 
 
 #Install the compiler
-sudo apt -y install build-essential
+sudo apt -y install build-essential     #Ubuntu 26.04.1 ships gcc15, which is not supported by nvcc 12.9
+#sudo apt -y install gcc-13 g++-13		#gcc13 and gcc14 are supported by nvcc 12.9
 
 #install git
 sudo apt -y install git
@@ -325,12 +326,13 @@ else
   USE_EXTERNAL_GPU=ON  #Use external GPU
   if [ "$machine" = "PC" ]; then
     if [[ "$GPUModelFirstTwo" == "50" ]]; then
-      wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2204/x86_64/cuda-keyring_1.1-1_all.deb
+      wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2604/x86_64/cuda-keyring_1.1-1_all.deb
+#      wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2204/x86_64/cuda-keyring_1.1-1_all.deb      #The two files are identical
       sudo dpkg -i cuda-keyring_1.1-1_all.deb
       sudo apt-get update
-      sudo apt-get -y install cuda-toolkit-12-9
-      echo 'export PATH=/usr/local/cuda-12.9/bin:$PATH' >> ~/.bashrc
-      echo 'export LD_LIBRARY_PATH=/usr/local/cuda-12.9/lib64:$LD_LIBRARY_PATH' >> ~/.bashrc
+      sudo apt-get -y install cuda-toolkit-13-3
+      echo 'export PATH=/usr/local/cuda-13.3/bin:$PATH' >> ~/.bashrc
+      echo 'export LD_LIBRARY_PATH=/usr/local/cuda-13.3/lib64:$LD_LIBRARY_PATH' >> ~/.bashrc
 
       CUDA_LINK="/usr/local/cuda"
 
@@ -339,11 +341,11 @@ else
         echo "Existing symbolic link: $(readlink "$CUDA_LINK")"
         sudo rm "$CUDA_LINK"
       fi
-      sudo ln -s /usr/local/cuda-12.9 "$CUDA_LINK"
+      sudo ln -s /usr/local/cuda-13.3 "$CUDA_LINK"
 
-      # Select the CUDA 12.9 compiler in this installer shell. This matters
+      # Select the CUDA 13.3 compiler in this installer shell. This matters
       # when /usr/bin/nvcc belongs to an older toolkit (for example 12.4).
-      export CUDA_HOME=/usr/local/cuda-12.9
+      export CUDA_HOME=/usr/local/cuda-13.3
       export PATH="$CUDA_HOME/bin:$PATH"
       export LD_LIBRARY_PATH="$CUDA_HOME/lib64:${LD_LIBRARY_PATH:-}"
       export CUDACXX="$CUDA_HOME/bin/nvcc"
@@ -381,6 +383,7 @@ else
     "$CUDACXX" --version
     CUDA_CMAKE_ARGS+=("-DCMAKE_CUDA_COMPILER:FILEPATH=$CUDACXX")
   fi
+  export NVCC_APPEND_FLAGS='-allow-unsupported-compiler'
   cmake -S . -B build -DGGML_CUDA=1 "${CUDA_CMAKE_ARGS[@]}"
   cmake --build build -j10 --config Release    #Don't use -j, there are 20 cores in my laptop, which will cause a peak memory usage
 fi
@@ -653,12 +656,12 @@ update-desktop-database ~/.local/share/applications/
 if [ "$machine" = "PC" ]; then
   cd "$BUILD_DIR"
   # Download Ubuntu 24.04 spcific keyring
-
-  wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2404/x86_64/cuda-keyring_1.1-1_all.deb
+  # I did it already. I don't need to do it again
+  # wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2404/x86_64/cuda-keyring_1.1-1_all.deb
   # Install keyring
-  sudo dpkg -i cuda-keyring_1.1-1_all.deb
+  # sudo dpkg -i cuda-keyring_1.1-1_all.deb
   # update package list
-  sudo apt-get update
+  # sudo apt-get update
   # install runtime library for YOLOv11-pose
   sudo apt-get install libcudnn9-cuda-12
   sudo ldconfig
