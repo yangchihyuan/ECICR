@@ -1,7 +1,7 @@
 #!/bin/bash
 set -Ee -o pipefail
 
-#Nov 3, 2026
+#Nov 11, 2026
 #Author: Chih-Yuan Yang
 PROJECT_NAME="ECICR"
 BUILD_DIR="$HOME/${PROJECT_NAME}_build"
@@ -77,15 +77,18 @@ if [ "$machine" = "PC" ]; then
 #    fi  
 #  fi
 
-  read -r -p "What is your GPU model? [3050/4050/4060/4070/4080/4090/5050/5080]" GPUModel
+  read -r -p "Do you have an Nvidia GPU? [Y/n]" HaveNvidiaGPU
+  if [[ -z "$HaveNvidiaGPU" || "$HaveNvidiaGPU" =~ ^[Yy]$ ]]; then
+    read -r -p "What is your GPU model? [3050/4050/4060/4070/4080/4090/5050/5080]" GPUModel
+    GPUModelFirstTwoDigits="${GPUModel:0:2}"
+    read -r -p "How large is your VRAM size in GB? " VRAMSize
 
-  GPUModelFirstTwo="${GPUModel:0:2}"
-
-  read -r -p "How large is your VRAM size in GB? " VRAMSize
-
-  if ! [[ "$VRAMSize" =~ ^[0-9]+$ ]]; then
-    echo "Error: VRAMSize must be a non-negative integer."
-    exit 1
+    if ! [[ "$VRAMSize" =~ ^[0-9]+$ ]]; then
+      echo "Error: VRAMSize must be a non-negative integer."
+      exit 1
+    fi
+  else
+    VRAMSize=0
   fi
 fi
 
@@ -325,9 +328,8 @@ if ((VRAMSize==0)); then
 else
   USE_EXTERNAL_GPU=ON  #Use external GPU
   if [ "$machine" = "PC" ]; then
-    if [[ "$GPUModelFirstTwo" == "50" ]]; then
+    if [[ "$GPUModelFirstTwoDigits" == "50" ]]; then
       wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2604/x86_64/cuda-keyring_1.1-1_all.deb
-#      wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2204/x86_64/cuda-keyring_1.1-1_all.deb      #The two files are identical
       sudo dpkg -i cuda-keyring_1.1-1_all.deb
       sudo apt-get update
       sudo apt-get -y install cuda-toolkit-13-3
@@ -663,9 +665,13 @@ if [ "$machine" = "PC" ]; then
   # update package list
   # sudo apt-get update
   # install runtime library for YOLOv11-pose
-  sudo apt-get install libcudnn9-cuda-12
-  sudo ldconfig
-  ls -l /usr/lib/x86_64-linux-gnu/libcudnn.so.9
+
+  #Here is a problem. If my PC has no GPU. How to run CuDNN?
+  if [ "$HaveNvidiaGPU" = "y" ] || [ "$HaveNvidiaGPU" = "Y" ]; then
+    sudo apt-get install libcudnn9-cuda-12
+    sudo ldconfig
+    ls -l /usr/lib/x86_64-linux-gnu/libcudnn.so.9
+  fi
 fi
 
 #For the audio_video_receiver program, we need to install python3-protobuf to let the program run properly. The protobuf version installed by the command "sudo apt install libprotobuf-dev" is 3.21.12, which is not compatible with the protobuf version used in the audio_video_receiver program. So, we need to install python3-protobuf to let the program run properly.
