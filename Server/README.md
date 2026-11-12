@@ -12,7 +12,7 @@ wget -O install.sh https://raw.githubusercontent.com/yangchihyuan/ECICR/refs/hea
 wget -O project.conf https://raw.githubusercontent.com/yangchihyuan/ECICR/refs/heads/main/Server/project.conf
 chmod +x install.sh
 echo "Don't use sudo ./install.sh. That is wrong."
-./install.s
+./install.sh
 ```
 
 It will ask for your sudo password several times, because the sudo password will expire atfer 15 minutes, but the process of installation take more than 1 hour to download and compile all required libraries.
