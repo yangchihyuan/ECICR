@@ -5,12 +5,14 @@ This folder contains the code files for the server side program of ECICR. It pro
 # Install
 We create a script file to install our code and all required libraries MediaPipe, OpenCV, git, gcc, Protocol Buffer, Qt, and PortAudio.
 The easiest way to install our program is to execute the following script.
+
 ```sh
 cd ~
 wget -O install.sh https://raw.githubusercontent.com/yangchihyuan/ECICR/refs/heads/main/Server/install.sh
+wget -O project.conf https://raw.githubusercontent.com/yangchihyuan/ECICR/refs/heads/main/Server/project.conf
 chmod +x install.sh
-./install.sh
 echo "Don't use sudo ./install.sh. That is wrong."
+./install.s
 ```
 
 It will ask for your sudo password several times, because the sudo password will expire atfer 15 minutes, but the process of installation take more than 1 hour to download and compile all required libraries.
