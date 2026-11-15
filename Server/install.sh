@@ -744,6 +744,7 @@ colcon build --symlink-install \
   --packages-select server_gui \
   --cmake-args \
     -DROBOT_MODEL="$RobotModel"
+
 #The order is important. The server_gui package must be built first because it is depended by the my_robot_bringup package.
 colcon build --symlink-install \
   --packages-select audio_video_receiver my_robot_bringup
