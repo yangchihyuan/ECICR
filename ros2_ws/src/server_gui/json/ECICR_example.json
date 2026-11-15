@@ -5,8 +5,8 @@
     "bShowPreviewWindow": true,
     "bSaveImages": false,
     "iImageSaveIntervalMillisecond": 5000,
-    "bFacialExpressionRecognition": false,
-    "bHumanPoseEstimation": false,
+    "bFacialExpressionRecognition": true,
+    "bHumanPoseEstimation": true,
     "PoseEstimationModel": "MediaPipe_Pose",        //Yolo11n_Pose, MediaPipe_Pose
     "bHandLandmarkDetection": false,
     "bUseDlibForFaceRecognition": false,            //I currently is not using dlib. It consumes 16G+ RAM.
