@@ -50,8 +50,8 @@ function(my_protobuf_generate_cpp PROTO_SRCS PROTO_HDRS PROTO_FILES)
     # Define the output .pb.cc and .pb.h files
     set(PROTO_CC "${CMAKE_CURRENT_BINARY_DIR}/${PROTO_DIR}/${PROTO_BASE}.pb.cc")
     set(PROTO_HH "${CMAKE_CURRENT_BINARY_DIR}/${PROTO_DIR}/${PROTO_BASE}.pb.h")
-    message(STATUS "CMAKE_CURRENT_BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR}")             #CMAKE_CURRENT_BINARY_DIR = /home/chihyuan/SoloSeniorWatchRobot/Server/build
-
+    message(STATUS "CMAKE_CURRENT_BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR}")
+    
     # Run protoc to generate the C++ files
     add_custom_command(
       OUTPUT ${PROTO_CC} ${PROTO_HH}
@@ -77,7 +77,6 @@ endfunction()
 list(APPEND CMAKE_PREFIX_PATH "/usr/local")
 
 # use Mediapipe's Protobuf
-#set(PROJECT_STRING "SoloSeniorWatchRobot")
 include("${CMAKE_CURRENT_SOURCE_DIR}/cmake/ProjectSettings.cmake")
 set(MEDIAPIPE_DIR "$ENV{HOME}/${PROJECT_STRING}_build/mediapipe")
 get_filename_component(MEDIAPIPE_DIRNAME "${MEDIAPIPE_DIR}" NAME)    #the result is "mediapipe"
@@ -148,13 +147,13 @@ message(STATUS 'PROTO_SRC ${PROTO_SRC}')
 
 # whisper.cpp v1.7.5
 add_library(LIBWHISPER SHARED IMPORTED)
-set(WHISPER_DIR $ENV{HOME}/SoloSeniorWatchRobot_build/whisper.cpp)
+set(WHISPER_DIR $ENV{HOME}/${PROJECT_STRING}_build/whisper.cpp)
 set_target_properties(LIBWHISPER PROPERTIES
   IMPORTED_LOCATION "${WHISPER_DIR}/build/src/libwhisper.so")
 target_include_directories(LIBWHISPER INTERFACE "${WHISPER_DIR}/include" "${WHISPER_DIR}/ggml/include" ${WHISPER_DIR}/examples)
 set(WHISPER_EXAMPLE_SOURCES ${WHISPER_DIR}/examples/common.cpp)
 
-add_executable(SoloSeniorWatchRobot ${SOURCES} ${SOURCES2} ${HEADERS} ${WHISPER_EXAMPLE_SOURCES})
+add_executable(${PROJECT_STRING} ${SOURCES} ${SOURCES2} ${HEADERS} ${WHISPER_EXAMPLE_SOURCES})
 
 
 
@@ -165,7 +164,7 @@ set(LIBMP_BIN_DIR "${MEDIAPIPE_DIR}/bazel-bin/mediapipe/examples/desktop/${LIBMP
 message(STATUS "USE_GPU: ${USE_GPU}")
 if(USE_GPU)
   set(LIBMP_SHARED_LIBRARY "${LIBMP_BIN_DIR}/${LIBMP_TARGET_NAME}_gpu.so")
-  target_compile_definitions(SoloSeniorWatchRobot
+  target_compile_definitions(${PROJECT_STRING}
   PRIVATE
     USE_GPU
   )
@@ -185,12 +184,12 @@ add_library(MP_FORMATS STATIC ${MP_FORMATS_SRC})
 target_include_directories(MP_FORMATS PUBLIC "${MEDIAPIPE_DIR}/bazel-bin")
 target_link_libraries(MP_FORMATS libprotobuf)
 
-target_link_libraries(SoloSeniorWatchRobot MP_FORMATS)
-target_link_libraries(SoloSeniorWatchRobot LIBMP)
+target_link_libraries(${PROJECT_STRING} MP_FORMATS)
+target_link_libraries(${PROJECT_STRING} LIBMP)
 
 #ICU, International Components for Unicode. Why do I need this?
 #It appears that I need to use the UTF-8 string in Qt6. Really?
-target_link_libraries(SoloSeniorWatchRobot ${ICU_LIBRARIES})
+target_link_libraries(${PROJECT_STRING} ${ICU_LIBRARIES})
 
 
 # ONNX
@@ -203,8 +202,8 @@ set_target_properties(LIBONNX PROPERTIES
 add_library(LIBEmotiEffNet SHARED IMPORTED)      #give the target a name
 set_target_properties(LIBEmotiEffNet PROPERTIES
   IMPORTED_LOCATION "${BUILD_DIR}/EmotiEffLib/emotieffcpplib/build/lib/libemotiefflib.so")
-target_link_libraries(SoloSeniorWatchRobot LIBEmotiEffNet)
-target_include_directories(SoloSeniorWatchRobot PUBLIC "${BUILD_DIR}/EmotiEffLib/emotieffcpplib/include"
+target_link_libraries(${PROJECT_STRING} LIBEmotiEffNet)
+target_include_directories(${PROJECT_STRING} PUBLIC "${BUILD_DIR}/EmotiEffLib/emotieffcpplib/include"
   "${BUILD_DIR}/EmotiEffLib/emotieffcpplib/3rdparty/xtensor/include"
   "${BUILD_DIR}/EmotiEffLib/emotieffcpplib/3rdparty/xtl/include")
 
@@ -216,19 +215,19 @@ target_include_directories(SoloSeniorWatchRobot PUBLIC "${BUILD_DIR}/EmotiEffLib
 
 #InspireFace
 add_library(LIBINSPIREFACE SHARED IMPORTED)
-set(INSPIREFACE_DIR "$ENV{HOME}/SoloSeniorWatchRobot_build/InspireFace/build/inspireface-linux-ubuntu/InspireFace")
+set(INSPIREFACE_DIR "$ENV{HOME}/${PROJECT_STRING}_build/InspireFace/build/inspireface-linux-ubuntu/InspireFace")
 set_target_properties(LIBINSPIREFACE PROPERTIES
   IMPORTED_LOCATION "${INSPIREFACE_DIR}/lib/libInspireFace.so")
-target_include_directories(SoloSeniorWatchRobot PRIVATE "${INSPIREFACE_DIR}/include")
-target_link_libraries(SoloSeniorWatchRobot LIBINSPIREFACE)
+target_include_directories(${PROJECT_STRING} PRIVATE "${INSPIREFACE_DIR}/include")
+target_link_libraries(${PROJECT_STRING} LIBINSPIREFACE)
 
 #httplib
 add_library(LIBHTTPLIB INTERFACE)
 target_include_directories(LIBHTTPLIB INTERFACE "${BUILD_DIR}/cpp-httplib")
 #set_target_properties(LIBHTTPLIB PROPERTIES
 #  IMPORTED_LOCATION "${BUILD_DIR}/cpp-httplib/httplib.h")
-target_include_directories(SoloSeniorWatchRobot PRIVATE "${BUILD_DIR}/cpp-httplib")
-target_link_libraries(SoloSeniorWatchRobot LIBHTTPLIB)
+target_include_directories(${PROJECT_STRING} PRIVATE "${BUILD_DIR}/cpp-httplib")
+target_link_libraries(${PROJECT_STRING} LIBHTTPLIB)
 
 # colcon installs the executable under install/..., whereas these libraries
 # intentionally remain in the locally built MediaPipe/AI dependency trees.
@@ -242,7 +241,7 @@ set(ROBOT_NURSE_RUNTIME_LIBRARY_DIRS
   "${INSPIREFACE_DIR}/lib"
 )
 list(JOIN ROBOT_NURSE_RUNTIME_LIBRARY_DIRS ";" ROBOT_NURSE_RUNTIME_RPATH)
-set_target_properties(SoloSeniorWatchRobot PROPERTIES
+set_target_properties(${PROJECT_STRING} PROPERTIES
   BUILD_RPATH "${ROBOT_NURSE_RUNTIME_RPATH}"
   INSTALL_RPATH "${ROBOT_NURSE_RUNTIME_RPATH}"
 )
@@ -257,18 +256,18 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/${RO
 #The next line is incorrect because CMAKE_CXX_FLAGS is a global variable rather than a property
 #set_target_properties(${TARGET_NAME} PROPERTIES "CMAKE_CXX_FLAGS" "${CMAKE_CXX_FLAGS}")
 
-target_include_directories(SoloSeniorWatchRobot PRIVATE
+target_include_directories(${PROJECT_STRING} PRIVATE
   ${CMAKE_CURRENT_BINARY_DIR}/Zenbo
   ${CMAKE_CURRENT_BINARY_DIR}/Kebbi
-  ${CMAKE_CURRENT_BINARY_DIR}/SoloSeniorWatchRobot_autogen/include
+  ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_STRING}_autogen/include
 )
 
-target_link_libraries(SoloSeniorWatchRobot LIBWHISPER
+target_link_libraries(${PROJECT_STRING} LIBWHISPER
     Qt::Core Qt::Widgets Qt::Network
     Qt::Multimedia Qt::MultimediaWidgets ${OpenCV_LIBS} portaudio LIBONNX nlohmann_json::nlohmann_json)
 # ROS 2 Lyrical no longer provides the legacy
 # ament_target_dependencies() CMake helper. Link the exported targets directly.
-target_link_libraries(SoloSeniorWatchRobot
+target_link_libraries(${PROJECT_STRING}
   ament_index_cpp::ament_index_cpp
   rclcpp::rclcpp
   sensor_msgs::sensor_msgs__rosidl_typesupport_cpp
@@ -276,24 +275,24 @@ target_link_libraries(SoloSeniorWatchRobot
 
 #set the compile definition
 if(ROBOT_MODEL STREQUAL "Kebbi")
-  target_compile_definitions(SoloSeniorWatchRobot
+  target_compile_definitions(${PROJECT_STRING}
     PRIVATE
       USE_KEBBI
   )
-  target_include_directories(SoloSeniorWatchRobot PRIVATE Kebbi)
+  target_include_directories(${PROJECT_STRING} PRIVATE Kebbi)
 elseif(ROBOT_MODEL STREQUAL "Zenbo")
-  target_compile_definitions(SoloSeniorWatchRobot
+  target_compile_definitions(${PROJECT_STRING}
     PRIVATE
       USE_ZENBO
   )
-  target_include_directories(SoloSeniorWatchRobot PRIVATE Zenbo)
+  target_include_directories(${PROJECT_STRING} PRIVATE Zenbo)
 else()
   message(FATAL_ERROR "Please set the robot model")
 endif()
 
 # Keep runtime files next to the ROS package share directory so paths such as
 # json/Setting.json and camera-shutter.wav work when launched with ros2 run.
-install(TARGETS SoloSeniorWatchRobot
+install(TARGETS ${PROJECT_STRING}
   DESTINATION lib/${PROJECT_NAME})
 install(DIRECTORY
   Eng_videos Images LLM Videos eng_images json Kebbi Zenbo
@@ -301,7 +300,7 @@ install(DIRECTORY
   DESTINATION share/${PROJECT_NAME}
   OPTIONAL)
 install(FILES
-  camera-shutter.wav SoloSeniorWatchRobot.png
+  camera-shutter.wav ${PROJECT_STRING}.png
   yolo11n-pose.onnx yolo11n.onnx
   PatientTitle_Chinese.txt PatientTitle_English.txt
   Sentence_Chinese.txt Sentence_English.txt Sentences_DirtyJokes.txt
