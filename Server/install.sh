@@ -410,15 +410,9 @@ else
   fi
 
   if ((VRAMSize==2)); then
-    #Check if the file exists. If it does not exist, download it.
-    if [ ! -f "./models/ggml-small.bin" ]; then
-      bash ./models/download-ggml-model.sh small
-    fi
+    bash ./models/download-ggml-model.sh small
   else
-    #Check if the file exists. If it does not exist, download it.
-    if [ ! -f "./models/ggml-large-v3-turbo.bin" ]; then
-      bash ./models/download-ggml-model.sh large-v3-turbo
-    fi
+    bash ./models/download-ggml-model.sh large-v3-turbo
   fi
   if [ "$machine" = "AGXOrin" ]; then
     #set up the ncvv path
