@@ -381,7 +381,7 @@ else
       wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2604/x86_64/cuda-keyring_1.1-1_all.deb
       sudo dpkg -i cuda-keyring_1.1-1_all.deb
       sudo apt-get update
-      sudo apt-get -y install cuda-toolkit-13-3
+      sudo apt-get -y install cuda-toolkit-13-3       #cuda 13 does not support RTX 1000 series
       echo 'export PATH=/usr/local/cuda-13.3/bin:$PATH' >> ~/.bashrc
       echo 'export LD_LIBRARY_PATH=/usr/local/cuda-13.3/lib64:$LD_LIBRARY_PATH' >> ~/.bashrc
 
@@ -404,7 +404,7 @@ else
       source ~/.bashrc
       "$CUDACXX" --version
     else
-      #The Ubuntu 26.04.1 has nvidia-cuda-toolkit 12.5, which does not support RTX 5000 series GPUs and 
+      #The Ubuntu 26.04.1 has nvidia-cuda-toolkit 12.4, which does not support RTX 5000 series GPUs
       sudo apt -y install nvidia-cuda-toolkit
     fi
   fi
